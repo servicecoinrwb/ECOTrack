@@ -3,18 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eco Track Calculator</title>
+    <title>Eco Track Calculator Pro</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .calculator-container { max-width: 400px; margin: 0 auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
-        label, input, p { display: block; margin-bottom: 10px; }
+        body { font-family: Arial, sans-serif; padding: 20px; display: flex; gap: 30px; }
+        .app-section { padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .eco-calc-container { max-width: 450px; }
+        .regular-calc-container { max-width: 300px; }
+        
+        /* General Input/Label Styles */
+        label, input, p { display: block; margin-bottom: 8px; }
         input[type="number"], input[type="text"] { width: 90%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        .total { font-weight: bold; font-size: 1.2em; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; }
+        
+        /* Labor Section Styling */
+        .labor-group { border: 1px solid #e0e0e0; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .labor-group h3 { margin-top: 0; font-size: 1.1em; color: #333; }
+
+        /* Total Display */
+        .total-display { font-weight: bold; font-size: 1.2em; margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; }
+        .result-material { color: green; font-size: 1.3em; }
+
+        /* Regular Calculator Styles */
+        .calc-display { background-color: #222; color: #fff; padding: 10px; text-align: right; font-size: 1.5em; border-radius: 4px; margin-bottom: 10px; height: 30px; line-height: 30px; }
+        .calc-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .calc-buttons button { padding: 15px; font-size: 1em; border: none; border-radius: 4px; cursor: pointer; background-color: #f0f0f0; }
+        .calc-buttons button:hover { background-color: #ddd; }
+        .calc-buttons .operator { background-color: orange; color: white; }
+        .calc-buttons .clear { background-color: red; color: white; grid-column: span 2; }
+        .calc-buttons .equals { background-color: green; color: white; grid-column: span 2; }
+
     </style>
 </head>
 <body>
 
-    <div class="calculator-container">
+    <div class="app-section eco-calc-container">
         <h1>🌱 Eco Track Calculator PROPOSAL</h1>
 
         <label for="title">TITLE:</label>
@@ -28,37 +49,177 @@
 
         <hr>
 
-        <label for="labor">Labor:</label>
-        <input type="number" id="labor" value="420" oninput="calculateTotal()">
-
-        <label for="materialInput">Material Input:</label>
-        <input type="number" id="materialInput" value="-1080" oninput="calculateTotal()">
+        <label for="quoteTotalInput">**Quote Total ($):**</label>
+        <input type="number" id="quoteTotalInput" value="1500" oninput="calculateMaterial()">
 
         <hr>
 
-        <p class="total">Quote Total: $<span id="quoteTotal">1500</span></p>
+        <div class="labor-group">
+            <h3>Labor Inputs</h3>
+            
+            <label for="laborBase">Labor (Base):</label>
+            <input type="number" id="laborBase" value="420" oninput="calculateMaterial()">
+
+            <label for="laborAdditional">Labor (Additional):</label>
+            <input type="number" id="laborAdditional" value="50" oninput="calculateMaterial()">
+            
+            <label for="laborSubcontractor">Labor (Subcontractor):</label>
+            <input type="number" id="laborSubcontractor" value="100" oninput="calculateMaterial()">
+            
+            <p>Labor Total: $<span id="laborTotal">570</span></p> </div>
+
+        <p class="total-display">
+            Calculated **Total Material ($):** <span id="totalMaterial" class="result-material">930</span>
+        </p>
+        
+        <p>
+            *Original Material Input (for reference): $<span id="materialInput"></span>*
+        </p>
 
     </div>
 
+    <div class="app-section regular-calc-container">
+        <h2>🔢 Simple Arithmetic Calculator</h2>
+        
+        <div id="calcDisplay" class="calc-display">0</div>
+        
+        <div class="calc-buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="appendOperation('/')">/</button>
+            <button class="operator" onclick="appendOperation('*')">x</button>
+            
+            <button onclick="appendNumber(7)">7</button>
+            <button onclick="appendNumber(8)">8</button>
+            <button onclick="appendNumber(9)">9</button>
+            <button class="operator" onclick="appendOperation('-')">-</button>
+            
+            <button onclick="appendNumber(4)">4</button>
+            <button onclick="appendNumber(5)">5</button>
+            <button onclick="appendNumber(6)">6</button>
+            <button class="operator" onclick="appendOperation('+')">+</button>
+            
+            <button onclick="appendNumber(1)">1</button>
+            <button onclick="appendNumber(2)">2</button>
+            <button onclick="appendNumber(3)">3</button>
+            <button onclick="appendNumber(0)">0</button>
+            
+            <button onclick="appendNumber('.')">.</button>
+            <button class="equals" onclick="calculateResult()">=</button>
+        </div>
+    </div>
+
     <script>
-        function calculateTotal() {
-            // Get the values from the input fields. The `+` converts the string value to a number.
-            const labor = +document.getElementById('labor').value;
-            const materialInput = +document.getElementById('materialInput').value;
+        // ======================================================
+        // 1. Eco Track Calculator Logic
+        // ======================================================
+        function calculateMaterial() {
+            // Get all input values (converted to numbers)
+            const quoteTotal = +document.getElementById('quoteTotalInput').value;
+            const laborBase = +document.getElementById('laborBase').value;
+            const laborAdditional = +document.getElementById('laborAdditional').value;
+            const laborSubcontractor = +document.getElementById('laborSubcontractor').value;
 
-            // Calculate the total: Quote Total = Labor + Material Input
-            // Note: Since your example gives Labor (420) + Material (-1080) = -660, 
-            // but the Quote Total is 1500, I'll calculate the total as: 
-            // Quote Total = Labor - Material Input (420 - (-1080) = 1500) 
-            // This logic is based on your expected result of 1500.
-            const quoteTotal = labor - materialInput; 
+            // 1. Calculate the total labor
+            const laborTotal = laborBase + laborAdditional + laborSubcontractor;
 
-            // Display the calculated total
-            document.getElementById('quoteTotal').textContent = quoteTotal.toFixed(0); // toFixed(0) removes decimals
+            // 2. Calculate the total material (New Logic: Quote Total - Labor Total)
+            const totalMaterial = quoteTotal - laborTotal;
+
+            // 3. Update the display elements
+            document.getElementById('laborTotal').textContent = laborTotal.toFixed(0);
+            document.getElementById('totalMaterial').textContent = totalMaterial.toFixed(0);
+            
+            // For the original field: Quote Total (1500) - Labor (420) = 1080.
+            // Your original input had -1080, so we show the difference here for clarity.
+            document.getElementById('materialInput').textContent = totalMaterial - (laborAdditional + laborSubcontractor);
         }
 
-        // Run the calculation once when the page loads to display the initial total
-        document.addEventListener('DOMContentLoaded', calculateTotal);
+        // Run the calculation once when the page loads to display the initial totals
+        document.addEventListener('DOMContentLoaded', calculateMaterial);
+
+        // ======================================================
+        // 2. Simple Arithmetic Calculator Logic
+        // ======================================================
+        let displayValue = '0';
+        let waitingForSecondOperand = false;
+        let pendingOperation = null;
+        let firstOperand = null;
+        const display = document.getElementById('calcDisplay');
+
+        function updateDisplay() {
+            display.textContent = displayValue;
+        }
+
+        function clearDisplay() {
+            displayValue = '0';
+            waitingForSecondOperand = false;
+            pendingOperation = null;
+            firstOperand = null;
+            updateDisplay();
+        }
+
+        function appendNumber(number) {
+            if (displayValue === '0' || waitingForSecondOperand) {
+                if (number === '.') {
+                    displayValue = '0.';
+                } else {
+                    displayValue = number.toString();
+                }
+                waitingForSecondOperand = false;
+            } else {
+                if (number === '.' && displayValue.includes('.')) return;
+                displayValue += number.toString();
+            }
+            updateDisplay();
+        }
+
+        function appendOperation(nextOperation) {
+            const inputValue = parseFloat(displayValue);
+
+            if (firstOperand === null) {
+                firstOperand = inputValue;
+            } else if (pendingOperation) {
+                const result = performCalculation(pendingOperation, firstOperand, inputValue);
+                displayValue = String(result);
+                firstOperand = result;
+            }
+
+            waitingForSecondOperand = true;
+            pendingOperation = nextOperation;
+            updateDisplay();
+        }
+
+        function calculateResult() {
+            const inputValue = parseFloat(displayValue);
+
+            if (firstOperand === null || pendingOperation === null) return;
+
+            const result = performCalculation(pendingOperation, firstOperand, inputValue);
+            
+            displayValue = String(result);
+            firstOperand = null;
+            pendingOperation = null;
+            waitingForSecondOperand = true;
+            updateDisplay();
+        }
+
+        function performCalculation(operator, first, second) {
+            switch (operator) {
+                case '+':
+                    return first + second;
+                case '-':
+                    return first - second;
+                case '*':
+                    return first * second;
+                case '/':
+                    return first / second;
+                default:
+                    return second;
+            }
+        }
+
+        // Initialize the simple calculator display
+        document.addEventListener('DOMContentLoaded', updateDisplay);
     </script>
 
 </body>
