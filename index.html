@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco Track Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .calculator-container { max-width: 400px; margin: 0 auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        label, input, p { display: block; margin-bottom: 10px; }
+        input[type="number"], input[type="text"] { width: 90%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .total { font-weight: bold; font-size: 1.2em; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <h1>🌱 Eco Track Calculator PROPOSAL</h1>
+
+        <label for="title">TITLE:</label>
+        <input type="text" id="title" value="PM REPAIR" readonly>
+
+        <label for="requestedBy">Requested By:</label>
+        <input type="text" id="requestedBy" value="MECHANICAL TEMP" readonly>
+
+        <label for="completionTime">COMPLETION TIME:</label>
+        <input type="text" id="completionTime" value="10" readonly>
+
+        <hr>
+
+        <label for="labor">Labor:</label>
+        <input type="number" id="labor" value="420" oninput="calculateTotal()">
+
+        <label for="materialInput">Material Input:</label>
+        <input type="number" id="materialInput" value="-1080" oninput="calculateTotal()">
+
+        <hr>
+
+        <p class="total">Quote Total: $<span id="quoteTotal">1500</span></p>
+
+    </div>
+
+    <script>
+        function calculateTotal() {
+            // Get the values from the input fields. The `+` converts the string value to a number.
+            const labor = +document.getElementById('labor').value;
+            const materialInput = +document.getElementById('materialInput').value;
+
+            // Calculate the total: Quote Total = Labor + Material Input
+            // Note: Since your example gives Labor (420) + Material (-1080) = -660, 
+            // but the Quote Total is 1500, I'll calculate the total as: 
+            // Quote Total = Labor - Material Input (420 - (-1080) = 1500) 
+            // This logic is based on your expected result of 1500.
+            const quoteTotal = labor - materialInput; 
+
+            // Display the calculated total
+            document.getElementById('quoteTotal').textContent = quoteTotal.toFixed(0); // toFixed(0) removes decimals
+        }
+
+        // Run the calculation once when the page loads to display the initial total
+        document.addEventListener('DOMContentLoaded', calculateTotal);
+    </script>
+
+</body>
+</html>
